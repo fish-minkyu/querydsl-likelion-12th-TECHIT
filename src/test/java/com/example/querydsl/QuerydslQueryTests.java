@@ -5,6 +5,7 @@ import com.example.querydsl.entity.QItem;
 import com.example.querydsl.entity.Shop;
 import com.example.querydsl.repo.ItemRepository;
 import com.example.querydsl.repo.ShopRepository;
+import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,14 +14,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.example.querydsl.entity.QItem.item;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Transactional
-@SpringBootTest // Bean들을 가져다 쓸 수 있다.
+@SpringBootTest
 @ActiveProfiles("test")
 public class QuerydslQueryTests {
   @Autowired
@@ -28,7 +29,7 @@ public class QuerydslQueryTests {
   @Autowired
   private ShopRepository shopRepository;
   @Autowired
-  private JPAQueryFactory jpaQueryFactory;
+  private JPAQueryFactory queryFactory;
 
   // @BeforeEach: 각 테스트 전에 실행할 코드를 작성하는 영역
   @BeforeEach
@@ -69,67 +70,177 @@ public class QuerydslQueryTests {
         .build(),
       Item.builder()
         .name("itemE")
-        .price(11000)
+        .price(5500)
         .stock(10)
         .build(),
       Item.builder()
-        .price(10500)
+        .price(7500)
         .stock(25)
         .build()
     ));
   }
 
+  // 가지고 오는 방법에 대해 애기해보자
   @Test
-  public void qType() {
-    QItem qItem = new QItem("item");
-    Item found = jpaQueryFactory
-      .select(qItem)
-      .from(qItem)
-      .where(qItem.name.eq("itemA"))
+  public void fetch() {
+    // fetch(): 단순하게 전체 조회
+    List<Item> foundList = queryFactory
+      // SELECT FROM 절
+      .selectFrom(item)
+      // 결과를 리스트 형태로 조회
+      .fetch();
+    assertEquals(6, foundList.size());
+
+    // fetchOne(): 하나만 조회하려고 시도
+    Item found = queryFactory
+      .selectFrom(item)
+      .where(item.id.eq(1L))
+      // 하나만 조회
       .fetchOne();
-    assertEquals("itemA", found.getName());
+    assertEquals(1L, found.getId());
 
-    found = jpaQueryFactory
-      // SELECT + FROM
-      .selectFrom(qItem)
-      .where(qItem.name.eq("itemB"))
+    // fetchOne은 nullable하다.
+    found = queryFactory
+      .selectFrom(item)
+      .where(item.id.eq(0L))
+      // 없을 경우 null
       .fetchOne();
-    assertEquals("itemB", found.getName());
+    assertNull(found);
 
-    // QItem 생성자의 인자가 Alias로 동작한다.
-    QItem qItem2 = new QItem("item2");
-    found = jpaQueryFactory
-      .selectFrom(qItem2)
-      .where(qItem2.name.eq("itemC"))
-      .fetchOne();
-
-    assertEquals("itemC", found.getName());
-
-    // 함부로 섞어쓰면 예외 발생
+    // fetchOne은 2개 이상일 경우 에러 발생
     assertThrows(Exception.class, () -> {
-      jpaQueryFactory
-        // SELECT item FROM Item item
-        .selectFrom(qItem)
-        // WHERE item2.name = "itemD" -> Error 발생
-        .where(qItem2.name.eq("itemD"))
+      queryFactory.selectFrom(item)
+        // 2개 이상일 경우 Exception이 발생한다.
         .fetchOne();
     });
 
-    // 섞어서 써야되는 경우는 나 자신과의 연관관계에서 섞어서 쓴다.
-    // 친구, 팔로우 User <- ManyToMany -> User
-
-    // 평소에는 기본 정적 QItem 인스턴스를 사용
-    found = jpaQueryFactory
-      .selectFrom(QItem.item)
-      .where(QItem.item.name.eq("itemA"))
-      .fetchOne();
-    assertEquals("itemA", found.getName());
-
-    // import static으로 바로 사용 가능
-    found = jpaQueryFactory
+    // fetchFirst(): 첫번째 결과 또는 null
+    found = queryFactory
       .selectFrom(item)
-      .where(item.name.eq("itemB"))
-      .fetchOne();
-    assertEquals("itemB", found.getName());
+      // Limit 1 -> fetchOne();
+      .fetchFirst();
+
+    // offest limit
+    foundList = queryFactory
+      .selectFrom(item)
+      .offset(3)
+      .limit(2)
+      .fetch();
+
+    for (Item find: foundList) {
+      System.out.println(find.getId());
+    }
+
+    // fetchCount(): 결과의 갯수 반환 (deprecated)
+    long count = queryFactory
+      .selectFrom(item)
+      // 앞 쪽 컬럼에 count 붙이기
+      .fetchCount(); // 사용 가능하나 노란색이 뜬다. (곧 사라질 기능이어서 노란줄 뜸)
+    assertEquals(6, count);
+
+    // fetchResults(): 결과 및 count + offset + limit 정보 반환 (deprecated) <- 향 후 미지원
+    QueryResults<Item> results = queryFactory
+      .selectFrom(item)
+      .offset(3)
+      .limit(2)
+      .fetchResults();
+
+    System.out.println(results.getTotal()); // 6
+    System.out.println(results.getOffset()); // 3
+    System.out.println(results.getLimit()); // 2
+    // 실제 내용은 getResults()
+    foundList = results.getResults();
+  }
+
+  @Test
+  public void sort() {
+    itemRepository.saveAll(List.of(
+      Item.builder()
+        .name("itemF")
+        .price(6000)
+        .stock(40)
+        .build(),
+      Item.builder()
+        .price(6000)
+        .stock(40)
+        .build()
+    ));
+
+    List<Item> foundList = queryFactory
+      // SELECT i FROM Item i
+      .selectFrom(item)
+      // item.(속성).(순서)를 ORDER BY 넣을 순서대로
+      // ORDER BY i.price asc
+      .orderBy(
+        // item.price.asc
+        item.price.asc(),
+        item.stock.desc(),
+        // null이 먼저냐 나중이냐
+        item.name.asc().nullsFirst()
+//        item.name.asc().nullsLast()
+      )
+      .fetch();
+
+    for (Item found: foundList) {
+      System.out.printf("%s: %d (%d)%n", found.getName(), found.getPrice(), found.getStock());
+    }
+  }
+
+  @Test
+  public void where() {
+    // item.(속성).(조건)
+    // equals, ( = )
+    item.name.eq("itemA");
+    // not equals, ( != )
+    item.name.ne("itemB");
+    // equals -> not, (!( = ))
+    item.name.eq("itemC").not();
+
+    // is null
+    item.name.isNull();
+    // is not null
+    item.name.isNotNull();
+    item.name.isNotEmpty();
+
+    // < <= >= >
+    item.price.lt(6000);
+    item.price.loe(6000);
+    item.price.goe(8000);
+    item.price.gt(7000);
+
+    item.price.between(5000, 10000);
+    item.price.in(5000, 6000, 7000, 8000);
+
+    // like, contain, startsWith, endsWith
+    // like는 SQL 문법을 따른다.
+    // %는 0개 또는 복수의 문자를 의미
+    // _는 1개의 문자를 의미
+    item.name.like("%item_");
+    // contains: 인자가 들어가면  %arg%
+    item.name.contains("item");
+    // startsWith, endsWith -> arg%, %arg
+    item.name.startsWith("item");
+    item.name.endsWith("item");
+
+    // 시간 관련
+    // 지금으로부터 5일전 보다 이후
+    item.createdAt.after(LocalDateTime.now().minusDays(5));
+    // 지금으로부터 5일전 보다 이전
+    item.createdAt.before(LocalDateTime.now().minusDays(5));
+
+
+    List<Item> foundItems = queryFactory
+      .selectFrom(item)
+      // where에 복수개 넣어주면, 전부 만족 (AND로 엮임)
+      .where(
+        item.name.isNotNull(),
+        item.price.lt(8000),
+        item.stock.gt(20)
+      )
+      .fetch();
+
+    for (Item found: foundItems) {
+      System.out.printf("%s: %d (%d)%n", found.getName(), found.getPrice(), found.getStock());
+    }
   }
 }

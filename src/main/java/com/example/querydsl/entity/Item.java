@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
+import org.springframework.stereotype.Component;
 
 @Setter
 @Getter
