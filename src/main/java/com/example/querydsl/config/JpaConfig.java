@@ -16,6 +16,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class JpaConfig {
 //  private final EntityManager entityManager;
 
+  // 외부에 있는 라이브러리 결과물을 Bean 객체로 등록하고 싶다면 Bean 어노테이션 사용
   @Bean
   public JPAQueryFactory jpaQueryFactory(
     EntityManager entityManager
