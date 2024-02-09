@@ -79,8 +79,13 @@ public class QuerydslQTypeTests {
     ));
   }
 
+  // 속성으로 Alias 바꿔주기
+//  private QItem qItem = item;
+
   @Test
   public void qType() {
+    // 속성으로 Alias를 바꿔준 모습
+    // qItem qItem = new QItem("item");
     QItem qItem = new QItem("item");
     Item found = jpaQueryFactory
       .select(qItem)
@@ -116,7 +121,7 @@ public class QuerydslQTypeTests {
     });
 
     // 섞어서 써야되는 경우는 나 자신과의 연관관계에서 섞어서 쓴다.
-    // 친구, 팔로우 User <- ManyToMany -> User
+    // 친구, 팔로우 User - ManyToMany - User
 
     // 평소에는 기본 정적 QItem 인스턴스를 사용
     found = jpaQueryFactory

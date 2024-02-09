@@ -18,6 +18,8 @@ public class JpaConfig {
 
   // 외부에 있는 라이브러리 결과물을 Bean 객체로 등록하고 싶다면 Bean 어노테이션 사용
   @Bean
+  // JpaQueryFactory
+  // : EntityManager를 받아서 Jpa를 사용해 DB를 조회하는 Querydsl 모듈 중 하나
   public JPAQueryFactory jpaQueryFactory(
     EntityManager entityManager
   ) {
