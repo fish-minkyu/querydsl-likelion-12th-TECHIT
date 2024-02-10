@@ -2,7 +2,7 @@
 
 - 2024.0206 ~ 0207 `12주차`
 - 0206 Querydsl
-- 0207 Querydsl
+- 0207 Querydsl - .and() & .or()
 
 2월 6일
 - JpaConfig
@@ -13,6 +13,9 @@
 - ShopRepository
 - QueryDslRepo
 - QuerydslQTypeTests
+- QuerydslQueryTests
+
+2월 7일
 - QuerydslQueryTests
 
 # 스펙
