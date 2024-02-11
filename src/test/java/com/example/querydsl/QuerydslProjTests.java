@@ -1,5 +1,6 @@
 package com.example.querydsl;
 
+import com.example.querydsl.dto.ItemDto;
 import com.example.querydsl.entity.Item;
 import com.example.querydsl.entity.QItem;
 import com.example.querydsl.entity.Shop;
@@ -7,6 +8,7 @@ import com.example.querydsl.repo.ItemRepository;
 import com.example.querydsl.repo.ShopRepository;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -143,5 +145,59 @@ public class QuerydslProjTests {
     }
   }
 
+  /*
+    SELECT new com.example.jpa.dto.ItemDto() ...
+  */
+  @Test
+  // dto로 projection을 해보자
+  public void dtoProjection() {
+    List<ItemDto> itemDtoList = null;
 
+    // Projections.bean: Setter 기반 Projection
+    itemDtoList = queryFactory
+      .select(Projections.bean(
+        ItemDto.class,
+        item.name,
+        item.price.as("cost"),
+        item.stock
+      ))
+      .from(item)
+      .where(item.name.isNotNull())
+      .fetch();
+    itemDtoList.forEach(System.out::println);
+
+    // Projections.fields: 속성 기반 Projection (Setter 없이 작동이 가능하다.)
+    // (단, Dto의 속성 기반으로 작동을 하여 Querydsl과 Dto의 속성이 다르다면 null이 나온다.)
+    itemDtoList = queryFactory
+      .select(Projections.fields(
+        ItemDto.class,
+        item.name,
+        // as로 alias 해주면 다른 속성 이름 사용 가능
+        item.price.as("cost"),
+        item.stock
+      ))
+      .from(item)
+      .where(item.name.isNotNull())
+      .fetch();
+    itemDtoList.forEach(System.out::println);
+
+    // Projections.constructor: 생성자 기반 Projections
+    itemDtoList = queryFactory
+      .select(Projections.constructor(
+        ItemDto.class,
+        // 인자를 넣을 수 있는 형태의 생성자를
+        // 찾아서 실행함으로서 객체를 만든다.
+        // (당연히, 생성자에 들어가는 인자의 순서가 일치하여야 한다.)
+        item.name,
+        item.price,
+        item.stock
+      ))
+      .from(item)
+      .where(
+        item.price.isNotNull(),
+        item.stock.isNotNull()
+      )
+      .fetch();
+    itemDtoList.forEach(System.out::println);
+  }
 }
