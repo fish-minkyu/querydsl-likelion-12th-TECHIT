@@ -2,7 +2,8 @@
 
 - 2024.0206 ~ 0207 `12주차`
 - 0206 Querydsl
-- 0207 Querydsl - .and() & .or()
+- 0207 Querydsl - .and() & .or(), Tuple, Projection
+- 
 
 2월 6일
 - JpaConfig
