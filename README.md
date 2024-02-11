@@ -2,7 +2,7 @@
 
 - 2024.0206 ~ 0207 `12주차`
 - 0206 Querydsl
-- 0207 Querydsl - .and() & .or(), Tuple, Projection
+- 0207 Querydsl - .and() & .or(), Tuple, Projection & QueryProjection
 - 
 
 2월 6일
@@ -15,9 +15,12 @@
 - QueryDslRepo
 - QuerydslQTypeTests
 - QuerydslQueryTests
+- QuerydslJoinTests
 
 2월 7일
-- QuerydslQueryTests
+- QuerydslProjTests
+- ItemDto
+- ItemDtoProj
 
 # 스펙
 
