@@ -1,5 +1,6 @@
 package com.example.querydsl.dto;
 
+import com.example.querydsl.entity.Item;
 import lombok.*;
 
 @Getter
@@ -11,7 +12,6 @@ public class ItemDto {
   public String name;
   public Integer cost;
   public Integer stock;
-  public Integer totalCost;
 
   public ItemDto(
     String name,
@@ -21,6 +21,13 @@ public class ItemDto {
     this.name = name;
     this.cost = cost;
     this.stock = stock;
-    this.totalCost = cost * stock;
+  }
+
+  public static ItemDto fromEntity(Item entity) {
+    return new ItemDto(
+      entity.getName(),
+      entity.getPrice(),
+      entity.getStock()
+    );
   }
 }

@@ -2,7 +2,7 @@
 
 - 2024.0206 ~ 0207 `12주차`
 - 0206 Querydsl
-- 0207 Querydsl - .and() & .or(), Tuple, Projection & QueryProjection
+- 0207 Querydsl - .and() & .or(), Tuple, Projection & QueryProjection & With Spring Data Jpa
 - 
 
 2월 6일
@@ -21,6 +21,10 @@
 - QuerydslProjTests
 - ItemDto
 - ItemDtoProj
+- ItemQuerydslRepo
+- ItemQuerydslRepoImpl
+- ItemController
+- ItemRepository
 
 # 스펙
 
