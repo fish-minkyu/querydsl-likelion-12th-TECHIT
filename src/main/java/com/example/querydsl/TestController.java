@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
   private final QueryDslRepo queryDslRepo;
 
+  // localhost:8080
   @GetMapping
   public String test() {
     queryDslRepo.helloQuerydsl();

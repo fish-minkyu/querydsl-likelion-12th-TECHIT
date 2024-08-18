@@ -3,19 +3,29 @@
 - 2024.0206 ~ 0207 `12주차`
 - 0206 Querydsl
 - 0207 Querydsl - .and() & .or(), Tuple, Projection & QueryProjection & With Spring Data Jpa
-- 
 
-2월 6일
-- JpaConfig
-- BaseEntity
-- Item
-- Shop
-- ItemRepository
-- ShopRepository
-- QueryDslRepo
-- QuerydslQTypeTests
-- QuerydslQueryTests
-- QuerydslJoinTests
+
+## 스팩
+
+
+<details>
+<summary><strong>02/06 Querydsl</strong></summary>
+
+<새로 생성한 파일>
+- BaseEntity: Entity끼리 공통된 속성을 묶기 위해 만듬
+- Item: Item Entity
+- Shop: Shop Entity
+- ItemRepository: JPA를 사용하여 Item Entity와 DB간의 상호작용을 관리
+- ShopRepository: JPA를 사용하여 Shop Entity와 DB간의 상호작용을 관리
+- QuerydslRepo: Querydsl을 이용하여 간단한 쿼리 작성
+- JpaConfig: EntityManager를 주입 받아 JpaQueryFactory를 생성하고 Bean 등록
+- TestController: QuerydslRepo의 컨트롤러
+- QuerydslQTypeTests: fetchOne() 공부
+- QuerydslQueryTests: Where 절에 사용할 조건들 공부
+
+
+</details>
+
 
 2월 7일
 - QuerydslProjTests

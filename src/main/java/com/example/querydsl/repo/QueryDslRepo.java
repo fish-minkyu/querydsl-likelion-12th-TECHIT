@@ -14,14 +14,14 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class QueryDslRepo {
-  // Query를 만들기 위한 Builder 역할을 한다.
+
   /*
   --- SELECT 문 (Statement)
   SELECT i               -- SELECT 절 (Clause)
   FROM Item i            -- FROM 절(Clause)
   WHERE i.name = :name   -- WHERE절 (Clause)
   */
-  private final JPAQueryFactory queryFactory; // Querydsl 시작
+  private final JPAQueryFactory queryFactory; // Querydsl 시작, Query를 만들기 위한 Builder 역할을 한다.
   private final ItemRepository itemRepository;
 
 /*  public QueryDslRepo(
@@ -37,16 +37,18 @@ public class QueryDslRepo {
         .stock(1000)
         .build());
 
-    /* JPQL
+/*  // JPQL
+    String a = """
       SELECT i
       FROM Item i
       WHERE i.name = :name
-    */
+      """;
+*/
 
-    // Qitem은 엔티티 그리고 엔티티가 가질 수 있는 속성을 나타낸다.
+    // QItem은 엔티티 그리고 엔티티가 가질 수 있는 속성을 나타낸다.
     QItem qItem = new QItem("item");
 
-    List<Item> items = queryFactory.select(qItem)
+    List<Item> items = queryFactory
       // SELECT절을 추가
       .select(qItem)
       // FROM절을 추가
@@ -55,7 +57,6 @@ public class QueryDslRepo {
       .where(qItem.name.eq("new item"))
       // 결과 조회
       .fetch();
-
 
     for (Item item: items) {
       log.info("{}: {} ({})", item.getName(), item.getPrice(), item.getStock());

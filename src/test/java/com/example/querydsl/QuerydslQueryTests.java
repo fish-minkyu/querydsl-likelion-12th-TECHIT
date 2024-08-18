@@ -105,7 +105,7 @@ public class QuerydslQueryTests {
     found = queryFactory
       .selectFrom(item)
       .where(item.id.eq(0L))
-      // 없을 경우 null
+      // 없을 경우 null이 반환된다.
       .fetchOne();
     assertNull(found);
 
@@ -150,7 +150,7 @@ public class QuerydslQueryTests {
     System.out.println(results.getTotal()); // 6
     System.out.println(results.getOffset()); // 3
     System.out.println(results.getLimit()); // 2
-    // 실제 내용은 getResults()
+    // 실제 내용은 getResults()로 반환을 받는다.
     foundList = results.getResults();
   }
 
@@ -171,13 +171,13 @@ public class QuerydslQueryTests {
     List<Item> foundList = queryFactory
       // SELECT i FROM Item i
       .selectFrom(item)
-      // item.(속성).(순서)를 ORDER BY 넣을 순서대로
+      // item.(속성).(순서)를 ORDER BY에 넣을 순서대로
       // ORDER BY i.price asc
       .orderBy(
         // item.price.asc
         item.price.asc(),
         item.stock.desc(),
-        // null이 먼저냐 나중이냐
+        // null이 먼저냐 나중이냐를 결정
         item.name.asc().nullsFirst()
 //        item.name.asc().nullsLast()
       )
@@ -204,10 +204,13 @@ public class QuerydslQueryTests {
     item.name.isNotNull();
     item.name.isNotEmpty();
 
-    // < <= >= >
+    // less than ( < )
     item.price.lt(6000);
+    // less or equal ( <= )
     item.price.loe(6000);
+    // greater or equal ( >= )
     item.price.goe(8000);
+    // greater than ( > )
     item.price.gt(7000);
 
     item.price.between(5000, 10000);
@@ -218,7 +221,7 @@ public class QuerydslQueryTests {
     // %는 0개 또는 복수의 문자를 의미
     // _는 1개의 문자를 의미
     item.name.like("%item_");
-    // contains: 인자가 들어가면  %arg%
+    // contains: arg -> %arg%
     item.name.contains("item");
     // startsWith, endsWith -> arg%, %arg
     item.name.startsWith("item");

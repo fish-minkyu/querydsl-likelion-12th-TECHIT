@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
-@SpringBootTest // Bean들을 가져다 쓸 수 있다.
-@ActiveProfiles("test")
+@SpringBootTest // Spring 프로젝트 Bean들을 전부 가져다 쓸 수 있다.
+@ActiveProfiles("test") // application-test.yaml 사용
 public class QuerydslQTypeTests {
   @Autowired
   private ItemRepository itemRepository;
@@ -84,8 +84,8 @@ public class QuerydslQTypeTests {
 
   @Test
   public void qType() {
-    // 속성으로 Alias를 바꿔준 모습
-    // qItem qItem = new QItem("item");
+    // 속성으로 Alias를 "item"으로 바꿔준 모습
+    // QItem qItem = new QItem("item");
     QItem qItem = new QItem("item");
     Item found = jpaQueryFactory
       .select(qItem)
@@ -121,9 +121,9 @@ public class QuerydslQTypeTests {
     });
 
     // 섞어서 써야되는 경우는 나 자신과의 연관관계에서 섞어서 쓴다.
-    // 친구, 팔로우 User - ManyToMany - User
+    // 친구(User 테이블), 팔로우(User 테이블) => User - ManyToMany - User
 
-    // 평소에는 기본 정적 QItem 인스턴스를 사용
+    // 평소에는 기본 정적 QItem 인스턴스를 사용 Ex. Q클래스 안에 있는 필드 public static final QItem item = new QItem("item");을 사용
     found = jpaQueryFactory
       .selectFrom(QItem.item)
       .where(QItem.item.name.eq("itemA"))
@@ -131,6 +131,7 @@ public class QuerydslQTypeTests {
     assertEquals("itemA", found.getName());
 
     // import static으로 바로 사용 가능
+    // Ex. import static com.example.querydsl.entity.QItem.item;
     found = jpaQueryFactory
       .selectFrom(item)
       .where(item.name.eq("itemB"))
