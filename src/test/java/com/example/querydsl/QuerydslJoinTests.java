@@ -104,13 +104,13 @@ public class QuerydslJoinTests {
     ));
   }
 
-  // JOIN 하는 방법
+  // JOIN 하는 방법, Querydsl에서 일반 join은 LAZY 방식이다.
   @Test
   public void regularJoins() {
     List<Item> foundList = queryFactory
       .selectFrom(item)
       // INNER JOIN
-       .join(item.shop)
+       .join(item.shop) // JPQL의 join 방식.
       // LEFT JOIN
       // .leftJoin(item.shop)
       // RIGHT JOIN
@@ -122,8 +122,8 @@ public class QuerydslJoinTests {
     }
   }
 
-
-  // 영속성 컨텍스트가 위에 있는 로직을 통해 shop 데이터를 주고 있으므로
+  // 02/07 2교시 14:40
+  // 영속성 컨텍스트가 위에 있는 로직을 통해 shop 데이터를 주고 있으므로 (shop을 저장하는 로직, line 57 ~ 68)
   // 일반 join을 했음에도 불구하고 shop 데이터가 load 되었다고 나왔다.
   // so, 영속성 컨텍스트를 초기화하기 위해 EntityManager를 추가했다.
   @Autowired
@@ -134,8 +134,8 @@ public class QuerydslJoinTests {
   @Test
   public void fetchJoin() {
     // 영속성 컨텍스트 초기화
-    entityManager.flush();
-    entityManager.clear();
+    entityManager.flush(); // 영속성 컨텍스트에서 데이터를 저장
+    entityManager.clear(); // 영속성 컨텍스트가 저장된 데이터를 버린다.
 
     // 그냥 join은 연관 데이터를 불러오지는 않는다. (연관된 데이터를 활용해서 where절에서 사용하기 위해 사용한다.)
     Item found = queryFactory

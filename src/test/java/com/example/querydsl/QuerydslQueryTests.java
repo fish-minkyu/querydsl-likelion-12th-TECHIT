@@ -122,7 +122,7 @@ public class QuerydslQueryTests {
       // Limit 1 -> fetchOne();
       .fetchFirst();
 
-    // offest limit
+    // Pagination => offest limit
     foundList = queryFactory
       .selectFrom(item)
       .offset(3)

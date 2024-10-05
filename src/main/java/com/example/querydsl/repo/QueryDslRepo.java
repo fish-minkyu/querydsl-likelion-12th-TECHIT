@@ -24,11 +24,13 @@ public class QueryDslRepo {
   private final JPAQueryFactory queryFactory; // Querydsl 시작, Query를 만들기 위한 Builder 역할을 한다.
   private final ItemRepository itemRepository;
 
-/*  public QueryDslRepo(
+/* JPAQueryFactory를 Configuration으로 설정해두어서 생성자 주입을 할 필요가 없다.
+  public QueryDslRepo(
     EntityManager entityManager
   ) {
     queryFactory = new JPAQueryFactory(entityManager);
-  }*/
+  }
+*/
 
   public void helloQuerydsl() {
     itemRepository.save(Item.builder()
