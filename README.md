@@ -7,7 +7,6 @@
 
 ## 스팩
 
-
 <details>
 <summary><strong>02/06 ~ 02/07 2교시 Querydsl Basics</strong></summary>
 
@@ -45,8 +44,6 @@
 - ItemQuerydslRepoImpl
 - ItemController
 - ItemRepository
-
-# 스펙
 
 # Key Point
 
