@@ -125,7 +125,7 @@ public class QuerydslProjTests {
 
     // 단일 속성이 아니면 Tuple
     Tuple resultTuple = queryFactory
-      .select(item.price, item.stock)
+      .select(item.price, item.stock) // 복수개이면 Tuple 사용해야 한다.
       .from(item)
       .where(item.name.eq("itemB"))
       .fetchOne();
@@ -147,7 +147,7 @@ public class QuerydslProjTests {
     }
   }
 
-  /*
+  /* 이런식으로 DTO를 활용하지 않을 것이다.
     SELECT new com.example.jpa.dto.ItemDto() ...
   */
   @Test

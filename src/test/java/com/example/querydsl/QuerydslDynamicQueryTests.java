@@ -244,7 +244,8 @@ public class QuerydslDynamicQueryTests {
     if (stock != null)
       // (여태까지의 조건) AND i.stock = stock
       booleanBuilder.and(item.stock.eq(stock));
-    // 모두가 null이 아니면 i.name = name AND i.price = price AND i.stock = stock
+    // 모두가 null이 아니면 booleanBuilder의 조건은
+    // i.name = name AND i.price = price AND i.stock = stock 이다.
 
     return queryFactory
       .selectFrom(item)

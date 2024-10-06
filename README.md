@@ -33,6 +33,10 @@
 
 <새로 생성한 파일>
 - QuerydslJoinTests: Join 연습.
+- QuerydslProjTests: Projection 공부.
+- ItemDto: Projection을 활용하기 위해 DTO를 만들었다.
+- ItemDtoProj: @QueryProjection을 위해 DTO를 만들었다.
+- QuerydslDynamicQueryTests: Dynamic Query를 연습하기 위해 만들었다.
 
 </details>
 
