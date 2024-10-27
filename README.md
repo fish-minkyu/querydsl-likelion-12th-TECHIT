@@ -29,7 +29,7 @@
 
 <수정한 파일>
 - QuerydslQueryTests: or, and 조건 쿼리 연습.
-
+- ItemDto: fromEntity 메소드 만듬.
 
 <새로 생성한 파일>
 - QuerydslJoinTests: Join 연습.
@@ -37,17 +37,13 @@
 - ItemDto: Projection을 활용하기 위해 DTO를 만들었다.
 - ItemDtoProj: @QueryProjection을 위해 DTO를 만들었다.
 - QuerydslDynamicQueryTests: Dynamic Query를 연습하기 위해 만들었다.
+- ItemController: Querydsl 커스텀 기능을 구현한 메소드를 사용하기 위한 컨트롤러다.
+- ItemSearchParams: 검색 기준을 담기 위한 DTO의 일종이다.
+- ItemQuerydslRepo: Querydsl 커스텀 기능을 구현하기 위한 인터페이스다.
+- ItemQuerydslRepoImpl: ItemQuerydslRepo의 구현 클래스다. (따로 설정이 없는 한 뒤에 Impl은 고정이다.)
 
 </details>
 
-2월 7일
-- QuerydslProjTests
-- ItemDto
-- ItemDtoProj
-- ItemQuerydslRepo
-- ItemQuerydslRepoImpl
-- ItemController
-- ItemRepository
 
 # Key Point
 

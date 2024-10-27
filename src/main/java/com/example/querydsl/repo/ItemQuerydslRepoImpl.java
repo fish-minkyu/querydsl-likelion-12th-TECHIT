@@ -45,6 +45,7 @@ public class ItemQuerydslRepoImpl implements ItemQuerydslRepo {
       .fetch();
     // 2. Pageable에 대한 데이터 (몇번째 페이지, 페이지 당 내용)
     //  -> 인자로 주어진다.
+    // 파라미터로 받는 Pageable 객체에 몇번째 페이지(index), 크기(size), offset에 대한 정보가 다 있다.
 
 /*    // 3. 총 갯수 (총 페이지를 위해서 필요한 정보)
     Long count = queryFactory
@@ -52,7 +53,8 @@ public class ItemQuerydslRepoImpl implements ItemQuerydslRepo {
       .from(item)
       .fetchOne();
     // PageImpl로 반환
-    return new PageImpl<>(content, pageable, count);*/
+    return new PageImpl<>(content, pageable, count);
+*/
 
     // 3+@. 총 갯수를 반환할 수 있는 방법
     JPAQuery<Long> countQuery = queryFactory
@@ -61,7 +63,9 @@ public class ItemQuerydslRepoImpl implements ItemQuerydslRepo {
     // PageableExcutionUtils.getPage()
     // 1. 첫번째 페이지
     // 2. (페이지 당 갯수를 채우지 못한) 마지막 페이지
-    // 의 경우에는 Count 쿼리를 실행하지 않는다.
+    // 의 경우에는 Count 쿼리를 실행하지 않는다. <- 즉, 쿼리를 1번 덜 실행하여 서버의 부담을 덜어준다.
     return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    // countQuery::fetchOne
+    // : fetchOne 메서드를 호출하면 총 item의 개수가 몇개인지 확인할 수 있다.
   }
 }

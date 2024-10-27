@@ -108,7 +108,7 @@ public class QuerydslDynamicQueryTests {
 
     // --------------------------------------------------------------------------------
 
-    // where절 null 체크
+    // booleanExpressions을 바탕으로 where절 null 체크
 
     results = booleanExpressions(name, price, stock);
     results.forEach(System.out::println);
@@ -135,94 +135,13 @@ public class QuerydslDynamicQueryTests {
     results.forEach(System.out::println);
   }
 
-  public List<Item> goeOrLoeOrBetween(
-    Integer priceFloor,
-    Integer priceCeil,
-    Boolean isAvailable
-  ) {
-    return queryFactory
-      .selectFrom(item)
-      .where(
-        priceBetween(priceFloor, priceCeil),
-        isAvailable(isAvailable)
-      )
-      .fetch();
-  }
 
-  private  BooleanExpression isAvailable(boolean flag) {
-    return flag ? item.stock.goe(1) : null;
-  }
 
-  // 최저가만 정해져있으면 최저가만 가지고 검색
-  // 최고가만 정해져있으면 최고가만 가지고 검색
-  // 최저가 ~ 최고가라면 그 사잇값만 가지고 검색
-  public List<Item> goeOrLoeOrBetween(
-    // 둘 다 있으면 사잇값
-    // 하나만 있으면, floor는 최솟값, ceil은 최댓값
-    Integer priceFloor,
-    Integer priceCeil
-  ) {
-    return goeOrLoeOrBetween(priceFloor, priceCeil, true);
+  // ---- 메소드 라인 -------------------------------------------------------------------------------------------------
 
-   /* return queryFactory
-      .selectFrom(item)
-      .where(priceBetween(priceFloor, priceCeil))
-      .fetch();*/
-  }
-
-  // 조건을 나타내는 메서드를 만드는 것이기 때문에
-  // 조건의 재활용이 간편하다.
-  private BooleanExpression priceBetween(Integer floor, Integer ceil) {
-    if (floor == null && ceil == null) return null;
-    if (floor == null) return priceLoe(ceil);
-    if (ceil == null) return priceGoe(floor);
-
-    return item.price.between(floor, ceil);
-  }
-
-  private BooleanExpression priceLoe(Integer price) {
-    return price != null ? item.price.loe(price) : null;
-  }
-
-  private BooleanExpression priceGoe(Integer price) {
-    return price != null ? item.price.goe(price) : null;
-  }
-
-  public List<Item> booleanExpressions(
-    String name,
-    Integer price,
-    Integer stock
-  ) {
-    return queryFactory
-      .selectFrom(item)
-      .where(
-        // 아래와 같이 결과가 나오게끔 하고 싶은데,
-        // 단 인자가 Null 이라면 들어가지 않게끔 하고 싶다.
-        // -> where 메서드는 null을 인자로 받으면 무시한다.
-        nameEquals(name),
-        priceEquals(price),
-        stockEquals(stock)
-      )
-      .fetch();
-  }
-
-  // 조건 자체를 격리할 수 있다.
-  // 따라서, 가독성과 활용성이 좋다.
-  private BooleanExpression nameEquals(String name) {
-    return name != null ? item.name.eq(name) : null;
-
-//    if (name != null) return item.name.eq(name);
-//    return null;
-  }
-
-  private BooleanExpression priceEquals(Integer price) {
-    return price != null ? item.price.eq(price) : null;
-  }
-
-  private BooleanExpression stockEquals(Integer stock) {
-    return stock != null ? item.stock.eq(stock) : null;
-  }
-
+  // BooleanBuilder를 이용한 동적쿼리 만들기.
+  // : BooleanBuilder에 직접 조건을 추가하기에
+  // 반드시 조건 코드들이 BooleanBuilder가 있는 메서드 안에 있어야 햔다.
   public List<Item> booleanBuilder(
     String name,
     Integer price,
@@ -252,22 +171,100 @@ public class QuerydslDynamicQueryTests {
       .where(booleanBuilder)
       .fetch();
   }
+
+  // -------------------------------------------------
+  // where절 다중 사용.
+  public List<Item> booleanExpressions(
+      String name,
+      Integer price,
+      Integer stock
+  ) {
+    return queryFactory
+        .selectFrom(item)
+        .where(
+            // booleanBuilder() 매소드와 같이 결과가 나오게끔 하고 싶은데,
+            // 단, 인자가 Null 이라면 조건이 들어가지 않게끔 하고 싶다.
+            // -> where 메서드는 null을 인자로 받으면 무시한다.
+            nameEquals(name),
+            priceEquals(price),
+            stockEquals(stock)
+        )
+        .fetch();
+  }
+
+  // 조건 자체를 격리할 수 있다.
+  // 따라서, 가독성과 활용성이 좋다.
+  private BooleanExpression nameEquals(String name) {
+    return name != null ? item.name.eq(name) : null;
+
+//    길게 쓴 버전.
+//    if (name != null) return item.name.eq(name);
+//    return null;
+  }
+
+  private BooleanExpression priceEquals(Integer price) {
+    return price != null ? item.price.eq(price) : null;
+  }
+
+  private BooleanExpression stockEquals(Integer stock) {
+    return stock != null ? item.stock.eq(stock) : null;
+  }
+
+  // -------------------------------------------------
+  // 최저가만 정해져있으면 최저가만 가지고 검색
+  // 최고가만 정해져있으면 최고가만 가지고 검색
+  // 최저가 ~ 최고가라면 그 사잇값만 가지고 검색
+  public List<Item> goeOrLoeOrBetween(
+      // 둘 다 있으면 사잇값
+      // 하나만 있으면, floor는 최솟값, ceil은 최댓값
+      Integer priceFloor,
+      Integer priceCeil
+  ) {
+    return goeOrLoeOrBetween(priceFloor, priceCeil, true);
+
+   /* return queryFactory
+      .selectFrom(item)
+      .where(priceBetween(priceFloor, priceCeil))
+      .fetch();*/
+  }
+
+  // 조건을 나타내는 메서드를 만드는 것이기 때문에
+  // 조건의 재활용이 간편하다.
+  private BooleanExpression priceBetween(Integer floor, Integer ceil) {
+    if (floor == null && ceil == null) return null;
+    if (floor == null) return priceLoe(ceil);
+    if (ceil == null) return priceGoe(floor);
+
+    return item.price.between(floor, ceil);
+  }
+
+  // 최고가
+  private BooleanExpression priceLoe(Integer price) {
+    return price != null ? item.price.loe(price) : null;
+  }
+
+  // 최저가
+  private BooleanExpression priceGoe(Integer price) {
+    return price != null ? item.price.goe(price) : null;
+  }
+
+  // -------------------------------------------------
+  // 구매가 가능한지도 확인하는 메소드.
+  public List<Item> goeOrLoeOrBetween(
+      Integer priceFloor,
+      Integer priceCeil,
+      Boolean isAvailable
+  ) {
+    return queryFactory
+        .selectFrom(item)
+        .where(
+            priceBetween(priceFloor, priceCeil),
+            isAvailable(isAvailable)
+        )
+        .fetch();
+  }
+
+  private  BooleanExpression isAvailable(boolean flag) {
+    return flag ? item.stock.goe(1) : null;
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

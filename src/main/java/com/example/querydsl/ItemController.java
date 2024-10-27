@@ -24,8 +24,8 @@ public class ItemController {
 
   @GetMapping("/search")
   public List<ItemDto> search(
-    // Query Parameter를 받아온다.
-    // search?name=name&priceFloor=1&priceCeil=10
+    // 아무런 어노테이션이 없다면 Query Parameter로 받아온다.
+    // Ex. /search?name=name&priceFloor=1&priceCeil=10
     ItemSearchParams searchParams
   ) {
     return itemRepository.searchDynamic(searchParams)
@@ -34,7 +34,7 @@ public class ItemController {
       .collect(Collectors.toList());
   }
 
-  @GetMapping("search-p")
+  @GetMapping("/search-p")
   public Page<ItemDto> search(
     // Query Parameter를 받아온다
     // /search?name=name&priceFloor=1&priceCeil=10
@@ -46,5 +46,4 @@ public class ItemController {
     return itemRepository.searchDynamic(searchParams, pageable)
       .map(ItemDto::fromEntity);
   }
-
 }
