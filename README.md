@@ -1,11 +1,23 @@
 # QueryDsl
 
 - 2024.0206 ~ 0207 `12주차`
-- 0206 Querydsl
+- 0206 Querydsl - Querydsl 초기 설정, fetchOne(), where절 조건 메서드
 - 0207 Querydsl - .and() & .or(), Tuple, Projection & QueryProjection & With Spring Data Jpa
 
 
 ## 스팩
+
+- Spring Boot 3.2.2
+- Spring Web
+- Lombok
+- querydsl 5.1.0
+- Spring Data Jpa
+- SQLite 3.41.2.2
+- H2
+- Starter Test
+
+
+## 히스토리
 
 <details>
 <summary><strong>02/06 ~ 02/07 2교시 Querydsl Basics</strong></summary>
@@ -44,8 +56,11 @@
 
 </details>
 
+## Key Point
 
-# Key Point
-
-# Github
-[likelion-backend-8-querydsl](https://github.com/edujeeho0/likelion-backend-8-querydsl)
+1. Querydsl 초기 설정. (EntityManager & JpaConfig)
+2. where절 조건문.
+3. 동적 쿼리.  
+    3-1. BooleanBuilder  
+    3-2. BooleanExpression(where 다중 조건)
+4. Querydsl 커스텀 메소드.(Pageable)
