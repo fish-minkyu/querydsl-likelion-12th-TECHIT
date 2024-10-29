@@ -3,6 +3,7 @@ package com.example.querydsl.repo;
 
 import com.example.querydsl.dto.ItemSearchParams;
 import com.example.querydsl.entity.Item;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +25,15 @@ public class ItemQuerydslRepoImpl implements ItemQuerydslRepo {
 
   @Override
   public List<Item> searchDynamic(ItemSearchParams searchParams) {
-    //todo QuerydslDynamicQueryTests에 있는 동적 쿼리를 구현해보기
+
     log.info(searchParams.toString());
-    return queryFactory.selectFrom(item).fetch();
+    return queryFactory
+        .selectFrom(item)
+        .where(
+            nameEquals(searchParams.getName()),
+            priceBetween(searchParams.getPriceFloor(), searchParams.getPriceCeil())
+        )
+        .fetch();
   }
 
   @Override
@@ -34,12 +41,14 @@ public class ItemQuerydslRepoImpl implements ItemQuerydslRepo {
     // pageable은 몇번째 페이지인지, 한 페이지 당 몇개의 데이터가 있는지, offset에 대한 정보가 있다.
 
     log.info(searchParams.toString());
-    //todo 동작 쿼리로 결과 반환하기
-
     // Page를 만드는데 필요한 3가지 정보
     // 1. (Offset, Limit 으로 페이지 처리 된) 실제 데이터
     List<Item> content = queryFactory
       .selectFrom(item)
+      .where(
+          nameEquals(searchParams.getName()),
+          priceBetween(searchParams.getPriceFloor(), searchParams.getPriceCeil())
+          )
       .offset(pageable.getOffset())
       .limit(pageable.getPageSize())
       .fetch();
@@ -68,4 +77,32 @@ public class ItemQuerydslRepoImpl implements ItemQuerydslRepo {
     // countQuery::fetchOne
     // : fetchOne 메서드를 호출하면 총 item의 개수가 몇개인지 확인할 수 있다.
   }
+
+  // ---------------------------------------
+  // where 다중 조건으로 동적쿼리 구현
+
+  private BooleanExpression nameEquals(String name) {
+    return name != null ? item.name.eq(name) : null;
+  }
+
+  private BooleanExpression priceBetween(Integer floor, Integer ceil) {
+    if (floor == null && ceil == null) return null;
+    if (floor == null) return priceLoe(ceil);
+    if (ceil == null) return priceGoe(floor);
+
+    return item.price.between(floor, ceil);
+  }
+
+  // 최고가
+  private BooleanExpression priceLoe(Integer price) {
+    return price != null ? item.price.loe(price) : null;
+  }
+
+  // 최저가
+  private BooleanExpression priceGoe(Integer price) {
+    return price != null ? item.price.goe(price) : null;
+  }
 }
+
+
+
